@@ -1,32 +1,65 @@
 import { Component, OnInit} from '@angular/core';
 import { PhoneService } from './service/phone.service';
 import { Phone } from './model/phone.model';
-//import { Params } from './model/params.model';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
-  title = 'frontend';
-
-  phonesData: any;
-
-   valid : boolean =  false;
-   country : string =  "Morocco";
+export class AppComponent{
+  title = 'angular-jumia-app-frontend';
 
 
 
-  constructor(private phones:PhoneService) {
-   }
+  phones:Phone[] = [];
+  stateFilter:string;
+  countryFilter:string;
+  columnDefs = [
+    { field: 'phone'},
+    { field: 'country' },
+    { field: 'countryCode' },
+    { field: 'validityStatus'}
+];
 
-    ngOnInit(){
-     this.phones.getPhones(this.country , this.valid)
-     .subscribe( (response) => {
-     console.log(response);
-     this.phonesData = response;
-     });
-     }
+rowData:Phone[] = [];
+  gridApi: any;
+  gridColumnApi: any;
+  noRowsTemplate:any;
+  loadingTemplate:any;
+
+  constructor(private api: PhoneService) {
+    this.getPhones();
+    this.stateFilter= 'All';
+    this.countryFilter='';
+
+
+  }
+  getPhones() {
+    this.api.getPhones()
+    .subscribe(resp => {
+      console.log(resp);
+     this.phones = [];
+      for (const data of resp) {
+        this.phones.push(data);
+      }console.log(this.phones);
+    });
+  }
+
+
+  onButtonPressed()
+  {
+    console.log("state="+this.stateFilter)
+    console.log("countryFilter:",this.countryFilter)
+    this.api.getPhonesWithFilter(this.stateFilter,this.countryFilter)
+      .subscribe(resp => {
+      console.log(resp);
+      this.phones = [];
+      for (const data of resp) {
+        this.phones.push(data);
+      }
+      console.log(this.phones);
+    });
+  }
 
 }

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpResponse} from "@angular/common/http";
+import {HttpClient, HttpResponse , HttpParams} from "@angular/common/http";
 import { Observable } from 'rxjs';
 import { Phone } from '../model/phone.model';
-//import { Params } from '../model/params.model';
 
 
 @Injectable({
@@ -16,14 +15,23 @@ export class PhoneService {
 
 
 
-  getPhones(country:string , valid:boolean)  {
-  const parameters = {
-      'country': country,
-      'valid': valid
-    };
-
-    return this.http.get(this.url , {params: parameters});
+  getPhones() : Observable<any>  {
+    return this.http.get<Phone[]>(this.url);
   }
+
+
+  getPhonesWithFilter(state:string, country:string) : Observable<any>  {
+
+    let params = new HttpParams({
+          fromObject : {
+            valid: state
+          }
+        });
+            if (country!=undefined && country!=null && country!="" && country.trim.length==0)
+                  params = params.append('country', country);
+        console.log(params.toString());
+        return this.http.get<Phone[]>(this.url,{params});
+    }
 }
 
 
